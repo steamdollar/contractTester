@@ -1,7 +1,7 @@
 const Web3 = require("web3");
 const web3 = new Web3("http://192.168.0.170:8545");
 
-const abi = require("./artifacts/contracts/deposit_contract.sol/DepositContract.json");
+const abi = require("../artifacts/contracts/deposit_contract.sol/DepositContract.json");
 const ca = "0x6744399f1D767d932BF4855bFD8a02d8b4C41bfE";
 const depositContract = new web3.eth.Contract(abi.abi, ca);
 

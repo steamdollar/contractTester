@@ -1,6 +1,6 @@
 // 3. contract deploy
 const deployContract = async () => {
-        const contractJSON = require("./artifacts/contracts/deposit_contract.sol/DepositContract.json");
+        const contractJSON = require("../artifacts/contracts/deposit_contract.sol/DepositContract.json");
         const abi = contractJSON.abi;
         const bytecode = contractJSON.bytecode;
 
@@ -31,7 +31,7 @@ const deployContract = async () => {
 
 // 4. call contract (not modifying state)
 const callContract = async () => {
-        const contractJSON = require("./artifacts/contracts/deposit_contract.sol/DepositContract.json");
+        const contractJSON = require("../artifacts/contracts/deposit_contract.sol/DepositContract.json");
         const abi = contractJSON.abi;
         const bytecode = contractJSON.bytecode;
 
@@ -48,7 +48,7 @@ const depositEther = async () => {
                 "0x1D61b265007c71BDE64ea2858bc31ECe265c1e42"
         );
 
-        const contractJSON = require("./artifacts/contracts/deposit_contract.sol/DepositContract.json");
+        const contractJSON = require("../artifacts/contracts/deposit_contract.sol/DepositContract.json");
         const abi = contractJSON.abi;
 
         const ca = readCa("ca.txt");

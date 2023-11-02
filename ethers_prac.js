@@ -6,7 +6,7 @@ const ethers = require("ethers");
 const { CounterContract } = require("./Counter");
 const { ixconfig } = require("./config.js");
 
-const { w1, w2, w3 } = require("./wallet").wallet;
+const { w1, w2, w3 } = require("./utils/wallet").wallet;
 
 const configs = new ixconfig(w1.private);
 

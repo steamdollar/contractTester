@@ -1,13 +1,12 @@
 {
   "devDependencies": {
-    "@nomicfoundation/hardhat-toolbox": "^2.0.0",
+    "@nomicfoundation/hardhat-toolbox": "^3.0.0",
+    "ethers": "^6.8.1",
     "hardhat": "^2.18.3"
   },
   "dependencies": {
     "@openzeppelin/contracts": "^5.0.0",
-    "ethers": "^5.7.2",
-    "keythereum": "^2.0.0",
-    "web3": "^1.8.1"
+    "keythereum": "^2.0.0"
   },
   "name": "hardhat",
   "description": "This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.",
