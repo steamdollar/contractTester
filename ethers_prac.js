@@ -78,24 +78,6 @@ const sendTxs = async () => {
         }
 };
 
-// 3. counter contract deploy
-const deployContract = async () => {
-        await myCounterContract.contractDeploy();
-        await myCounterContract.printInitialNumber();
-};
-
-// 4. call contract (not modifying state)
-const getCurrentNumber = async () => {
-        await myCounterContract.getCurrentNum();
-};
-
-// 5. modify contract state
-const decreaseNumber = async () => {
-        await myCounterContract.decreaseNum();
-};
-
-// 이거 class로 바꾸자..
-
 // 5. ix w/ contract (modifying state)
 const depositEther = async () => {
         const nonce = await provider.getTransactionCount(
@@ -149,7 +131,6 @@ const main = async () => {
                 case "balance":
                         getBalance();
                         break;
-
                 case "sendTx":
                         sendTx();
                         break;
@@ -157,22 +138,22 @@ const main = async () => {
                         sendTxs();
                         break;
                 case "deploy":
-                        deployContract();
+                        await myCounterContract.contractDeploy();
                         break;
                 case "getNum":
-                        getCurrentNumber();
+                        await myCounterContract.getCurrentNum();
                         break;
-                case "dec":
-                        decreaseNumber();
+                case "mani":
+                        await myCounterContract.manipulateNum(process.argv[3]);
                         break;
                 default:
                         console.log("specify functions");
                         console.log("1. getBalance");
                         console.log("2. SendTx");
-                        console.log("3. SendTxs");
+                        console.log("3. SendTxs n");
                         console.log("4. deploy");
                         console.log("5. getNum");
-                        console.log("6. dec");
+                        console.log("6. dec i/d");
         }
 };
 

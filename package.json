@@ -1,11 +1,25 @@
 {
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^2.0.0",
-    "hardhat": "^2.12.3"
+    "hardhat": "^2.18.3"
   },
   "dependencies": {
+    "@openzeppelin/contracts": "^5.0.0",
     "ethers": "^5.7.2",
     "keythereum": "^2.0.0",
     "web3": "^1.8.1"
-  }
+  },
+  "name": "hardhat",
+  "description": "This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.",
+  "version": "1.0.0",
+  "main": "Counter.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }

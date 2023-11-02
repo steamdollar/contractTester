@@ -3,33 +3,25 @@ const fs = require("fs");
 
 class CounterContract {
         contractJSON;
-        abi;
-        bytecode;
+        provider;
         signer;
         contractFactory;
         contract;
-        contractSigner;
         ca;
 
-        // "./artifacts/contracts/counter.sol/Counter.json"
-        constructor(filepath, signer, provider) {
+        constructor(filepath, signer) {
                 this.contractJSON = require(filepath);
-                this.abi = this.contractJSON.abi;
-                this.bytecode = this.contractJSON.bytecode;
                 this.signer = signer;
-                // this.provider = provider;
 
                 if (fs.readFileSync("./ca.txt")) {
                         this.ca = fs.readFileSync("./ca.txt").toString("utf8");
                 }
-
-                this.newContractFactory();
         }
 
         newContractFactory() {
                 this.contractFactory ??= new ethers.ContractFactory(
-                        this.abi,
-                        this.bytecode,
+                        this.contractJSON.abi,
+                        this.contractJSON.bytecode,
                         this.signer
                 );
         }
@@ -37,30 +29,25 @@ class CounterContract {
         newContractInstance() {
                 this.contract ??= new ethers.Contract(
                         this.ca,
-                        this.abi,
+                        this.contractJSON.abi,
                         this.signer
                 );
         }
 
-        // newContractSigner(signer) {
-        //         this.contractSigner ??= new ethers.Contract(
-        //                 this.ca,
-        //                 this.abi,
-        //                 signer
-        //         );
-        // }
-
         async contractDeploy() {
+                this.newContractFactory();
                 const contract = await this.contractFactory.deploy(2);
                 await contract.deployed();
 
                 console.log(`ca : ${contract.address}`);
                 this.ca = contract.address;
 
-                fs.writeFile("ca.txt", this.ca, (err) => {
+                fs.writeFileSync("ca.txt", this.ca, (err) => {
                         if (err) throw err;
                         console.log("ca saved to ca.txt");
                 });
+
+                this.printInitialNumber();
         }
 
         async printInitialNumber() {
@@ -70,23 +57,25 @@ class CounterContract {
         }
 
         async getCurrentNum() {
-                this.contract ??= new ethers.Contract(
-                        this.ca,
-                        this.abi,
-                        this.signer
-                );
+                this.newContractInstance();
                 const currentNumber = await this.contract.showNum();
                 console.log(`current number : ${currentNumber}`);
         }
 
-        async decreaseNum() {
-                this.contract ??= new ethers.Contract(
-                        this.ca,
-                        this.abi,
-                        this.signer
-                );
+        async manipulateNum(control) {
+                this.newContractInstance();
 
-                const tx = await this.contract.decrease();
+                let tx;
+
+                if (control === "i") {
+                        tx = await this.contract.increase();
+                } else if (control === "d") {
+                        tx = await this.contract.decrease();
+                } else {
+                        console.log("i or d only");
+                        return;
+                }
+
                 await tx.wait();
                 this.getCurrentNum();
         }
