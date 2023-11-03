@@ -5,6 +5,7 @@ const fs = require("fs");
 const ethers = require("ethers");
 const { CounterContract } = require("./Counter");
 const { ixconfig } = require("./config.js");
+const { makeTx } = require("./func/tx");
 
 const { w1, w2, w3 } = require("./utils/wallet").wallet;
 
@@ -12,40 +13,28 @@ const configs = new ixconfig(w1.private);
 
 const myCounterContract = new CounterContract(
         "./artifacts/contracts/counter.sol/Counter.json",
-        configs.signer,
-        configs.provider
+        configs
 );
 
 // 1. balance
 const getBalance = async () => {
         const balance = await configs.provider.getBalance(w3.public);
-        console.log(ethers.utils.formatEther(balance));
+        console.log(ethers.formatEther(balance));
 };
 
 // 2. tx
 const sendTx = async () => {
-        const nonce = await configs.provider.getTransactionCount(w1.public);
-
-        // 다음과 같이 tx 객체를 만들어 서명 후, 보내면 된다.
-        const tx = {
+        const txConfig = {
                 to: w2.public,
-                value: ethers.utils.parseEther("12"),
+                value: ethers.parseEther("12"),
                 gasLimit: configs.gasLimit,
-                gasPrice: ethers.utils.parseUnits("30", "gwei"),
+                gasPrice: ethers.parseUnits("30", "gwei"),
                 chainId: configs.chainId,
-                nonce: nonce,
+                nonce: null,
         };
 
-        const signedTx = await configs.signer.signTransaction(tx);
-        const txResponse = await configs.provider.sendTransaction(signedTx);
-        console.log("Transaction sent:", txResponse.hash);
-
-        // const txReceipt = await provider.getTransactionReceipt(txResponse.hash)
-        // console.log(txReceipt)
-
-        // 이건 tx가 컨펌되건 말건 상관없이 요청을 보내 응답을 가져오므로
-        // 영수증이 null이 뜰 수가 있다.
-        // 방금 보낸 tx를 받고 싶다면 위의 waitForTransaction method를 사용할 것.
+        const txObj = new makeTx(txConfig, configs);
+        txObj.sendTx();
 };
 
 // 2.1 txs
@@ -56,74 +45,18 @@ const sendTxs = async () => {
 
         // 연속적으로 tx를 보내고 싶다면 다음과 같이 nonce값, gasprice를 증가시키며 반복
         for (let i = nonce; i < nonce + txNum; i++) {
-                const tx = {
+                const txConfig = {
                         nonce: i,
                         to: w2.public,
-                        value: ethers.utils.parseEther(`${(i + 1) / 100}`),
+                        value: ethers.parseEther(`${(i + 1) / 100}`),
                         gasLimit: configs.gasLimit,
-                        gasPrice: ethers.utils.parseUnits(
-                                `${10 * i + 1}`,
-                                "gwei"
-                        ),
+                        gasPrice: ethers.parseUnits(`${10 * i + 1}`, "gwei"),
                         chainId: configs.chainId,
                 };
+                const tx = await configs.signer.sendTransaction(txConfig);
 
-                const signedTx = await configs.signer.signTransaction(tx);
-                const txResponse = await configs.provider.sendTransaction(
-                        signedTx
-                );
-                if (i % 200 == 0 || i == 999) {
-                        console.log("Transaction sent:", txResponse.hash);
-                }
+                console.log(tx.hash);
         }
-};
-
-// 5. ix w/ contract (modifying state)
-const depositEther = async () => {
-        const nonce = await provider.getTransactionCount(
-                "0x1D61b265007c71BDE64ea2858bc31ECe265c1e42"
-        );
-
-        const contractJSON = require("./artifacts/contracts/deposit_contract.sol/DepositContract.json");
-        const abi = contractJSON.abi;
-
-        const ca = configs.readCa("ca.txt");
-
-        const contractInstance = new ethers.Contract(ca, abi, provider);
-
-        const deposit_data = require("./deposit_data-1670987629.json");
-        const dd = deposit_data[0];
-
-        const bufferHex = (x) => Buffer.from(x, "hex");
-
-        const params = [
-                bufferHex(dd.pubkey),
-                bufferHex(dd.withdrawal_credentials),
-                bufferHex(dd.signature),
-                bufferHex(dd.deposit_data_root),
-        ];
-
-        const data = contractInstance.interface.encodeFunctionData(
-                "deposit",
-                params
-        );
-
-        const tx = {
-                nonce: nonce + 1,
-                to: ca,
-                value: ethers.utils.parseEther("32"),
-                gasLimit: 210000,
-                gasPrice: ethers.utils.parseUnits("30", "gwei"),
-                chainId: 32382,
-                data: data,
-        };
-
-        const signedTx = await signer.signTransaction(tx);
-        const txResponse = await provider.sendTransaction(signedTx);
-        console.log("Transaction sent:", txResponse.hash);
-
-        const txReceipt = await provider.waitForTransaction(txResponse.hash);
-        console.log(txReceipt);
 };
 
 const main = async () => {
@@ -141,7 +74,8 @@ const main = async () => {
                         await myCounterContract.contractDeploy();
                         break;
                 case "getNum":
-                        await myCounterContract.getCurrentNum();
+                        const curNum = await myCounterContract.getCurrentNum();
+                        console.log(curNum);
                         break;
                 case "mani":
                         await myCounterContract.manipulateNum(process.argv[3]);

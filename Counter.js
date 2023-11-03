@@ -9,10 +9,10 @@ class CounterContract {
         contract;
         ca;
 
-        constructor(filepath, signer) {
+        constructor(filepath, configs) {
                 this.contractJSON = require(filepath);
-                this.signer = signer;
-
+                this.signer = configs.signer;
+                this.provider = configs.provider;
                 if (fs.readFileSync("./ca.txt")) {
                         this.ca = fs.readFileSync("./ca.txt").toString("utf8");
                 }
@@ -27,7 +27,7 @@ class CounterContract {
         }
 
         newContractInstance() {
-                this.contract ??= new ethers.Contract(
+                this.contract ??= new ethers.BaseContract(
                         this.ca,
                         this.contractJSON.abi,
                         this.signer
@@ -36,30 +36,30 @@ class CounterContract {
 
         async contractDeploy() {
                 this.newContractFactory();
-                const contract = await this.contractFactory.deploy(2);
-                await contract.deployed();
 
-                console.log(`ca : ${contract.address}`);
-                this.ca = contract.address;
+                const contract = await this.contractFactory.deploy(2);
+                console.log(`ca : ${contract.target}`);
+
+                const deployed = await contract.waitForDeployment();
+
+                this.ca = deployed.target;
+
+                // 배포 완료까지 기다리기
 
                 fs.writeFileSync("ca.txt", this.ca, (err) => {
                         if (err) throw err;
                         console.log("ca saved to ca.txt");
                 });
 
-                this.printInitialNumber();
-        }
-
-        async printInitialNumber() {
-                this.newContractInstance();
-                const initialNumber = await this.contract.showNum();
-                console.log(`initial number : ${initialNumber}`);
+                const initNum = await this.getCurrentNum();
+                console.log(`initial Number : ${initNum}`);
         }
 
         async getCurrentNum() {
                 this.newContractInstance();
                 const currentNumber = await this.contract.showNum();
-                console.log(`current number : ${currentNumber}`);
+
+                return Number(currentNumber);
         }
 
         async manipulateNum(control) {
@@ -77,7 +77,8 @@ class CounterContract {
                 }
 
                 await tx.wait();
-                this.getCurrentNum();
+                const curNum = await this.getCurrentNum();
+                console.log(curNum);
         }
 }
 

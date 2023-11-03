@@ -18,5 +18,8 @@ module.exports = {
         },
 };
 
+// npm outdated
+// npm install --save-dev ethers@latest
+// npm install --save-dev @nomicfoundation/hardhat-toolbox@latest
 // npm install --save-dev hardhat
 // npx hardhat compile
