@@ -16,3 +16,15 @@ const check = (caData) => {
 
 const caData = readShit();
 check(caData);
+
+//
+
+const a2 = (...params) => {
+        console.log(...params);
+};
+
+const a1 = (...params) => {
+        a2(...params);
+};
+
+a1("a", "b", "c");

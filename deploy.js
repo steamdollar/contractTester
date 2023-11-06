@@ -3,12 +3,14 @@ const ethers = require("ethers");
 class Deploy {
         contractJSON;
         signer;
+        provider;
         contractFactory;
         contract;
 
-        constructor(filepath, signer) {
+        constructor(filepath, configs) {
                 this.contractJSON = require(filepath);
-                this.signer = signer;
+                this.signer = configs.signer;
+                this.provider = configs.provider;
                 this.createContractFactory();
         }
 
@@ -20,9 +22,13 @@ class Deploy {
                 );
         }
 
-        async contractDeploy() {
+        async contractDeploy(...initVar) {
                 this.createContractFactory();
-                const contract = await this.contractFactory.deploy(2);
-                await contract.deployed();
+                const contract = await this.contractFactory.deploy(...initVar);
+
+                console.log(`ca : ${contract.target}`);
+                const deployed = await contract.waitForDeployment();
         }
 }
+
+module.exports = { Deploy };

@@ -6,6 +6,8 @@ const ethers = require("ethers");
 const { CounterContract } = require("./Counter");
 const { ixconfig } = require("./config.js");
 const { makeTx } = require("./func/tx");
+const { Deploy } = require("./deploy");
+const { ERC20 } = require("./erc20");
 
 const { w1, w2, w3 } = require("./utils/wallet").wallet;
 
@@ -34,7 +36,7 @@ const sendTx = async () => {
         };
 
         const txObj = new makeTx(txConfig, configs);
-        txObj.sendTx();
+        txObj.sendTxAndWait();
 };
 
 // 2.1 txs
@@ -80,14 +82,32 @@ const main = async () => {
                 case "mani":
                         await myCounterContract.manipulateNum(process.argv[3]);
                         break;
+
+                case "erc20":
+                        const dir =
+                                "./artifacts/contracts/myToken.sol/MyToken.json";
+                        const deployer = new Deploy(dir, configs);
+                        await deployer.contractDeploy(
+                                ethers.parseEther("10000")
+                        );
+                        break;
+                case "tokenSend":
+                        const dir2 =
+                                "./artifacts/contracts/myToken.sol/MyToken.json";
+                        const erc20contract = new ERC20(dir2, configs);
+
+                        await erc20contract.transfer("10");
+
+                        break;
+
                 default:
                         console.log("specify functions");
-                        console.log("1. getBalance");
+                        console.log("1. balance");
                         console.log("2. SendTx");
                         console.log("3. SendTxs n");
                         console.log("4. deploy");
                         console.log("5. getNum");
-                        console.log("6. dec i/d");
+                        console.log("6. mani i/d");
         }
 };
 
