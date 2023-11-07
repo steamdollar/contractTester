@@ -1,7 +1,7 @@
 const ethers = require("ethers");
 
-class ERC20 {
-        contractJSO;
+class ERC20Contract {
+        contractJSON;
         provider;
         signer;
         contractFactory;
@@ -23,33 +23,23 @@ class ERC20 {
                 );
         }
 
-        // 이렇게 하는거 아닌것 같음..
-        // 컨트랙트의 method를 사용하고 싶은데..
-        async transfer(amount) {
+        async transfer(to, amount) {
                 this.newContractInstance();
-                const w1 = "0x1d61b265007c71bde64ea2858bc31ece265c1e42";
                 const w2 = "0xaca8126914b246634b08d4f9fdf31a1970ed9005";
 
-                // Transfer is not a function
-                // const transfer = await this.contract.Transfer(w1, w2, 10);
-
-                //console.log(transfer);
-                const data = this.contract.interface.encodeFunctionData(
-                        "transfer",
-                        [w2, ethers.parseEther(amount)]
+                const token = new ethers.Contract(
+                        this.ca,
+                        this.contractJSON.abi,
+                        this.signer
                 );
 
-                const tx = await this.signer.sendTransaction({
-                        to: this.ca,
-                        from: this.signer.address,
-                        value: ethers.parseEther("0"),
-                        data: data,
-                });
-
-                const receipt = await tx.wait();
-
-                console.log(receipt);
+                await this.contract
+                        .transfer(to, ethers.parseEther(amount))
+                        .then((result) => {
+                                console.log(result.hash);
+                        })
+                        .catch((e) => console.log(e));
         }
 }
 
-module.exports = { ERC20 };
+module.exports = { ERC20Contract };

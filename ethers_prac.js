@@ -6,8 +6,8 @@ const ethers = require("ethers");
 const { CounterContract } = require("./Counter");
 const { ixconfig } = require("./config.js");
 const { makeTx } = require("./func/tx");
-const { Deploy } = require("./deploy");
-const { ERC20 } = require("./erc20");
+const { DeployContract } = require("./deploy");
+const { ERC20Contract } = require("./erc20");
 
 const { w1, w2, w3 } = require("./utils/wallet").wallet;
 
@@ -29,7 +29,6 @@ const sendTx = async () => {
         const txConfig = {
                 to: w2.public,
                 value: ethers.parseEther("12"),
-                gasLimit: configs.gasLimit,
                 gasPrice: ethers.parseUnits("30", "gwei"),
                 chainId: configs.chainId,
                 nonce: null,
@@ -41,24 +40,8 @@ const sendTx = async () => {
 
 // 2.1 txs
 const sendTxs = async () => {
-        // nonce 값은 tx 보내고 confirm되기 전까지 바뀌지 않는다.
-        // 값이 업데이트 되기 전까지 시간이 걸리는데 연속적으로 tx를 보내려면
-        const nonce = await configs.provider.getTransactionCount(w1.public);
-
-        // 연속적으로 tx를 보내고 싶다면 다음과 같이 nonce값, gasprice를 증가시키며 반복
-        for (let i = nonce; i < nonce + txNum; i++) {
-                const txConfig = {
-                        nonce: i,
-                        to: w2.public,
-                        value: ethers.parseEther(`${(i + 1) / 100}`),
-                        gasLimit: configs.gasLimit,
-                        gasPrice: ethers.parseUnits(`${10 * i + 1}`, "gwei"),
-                        chainId: configs.chainId,
-                };
-                const tx = await configs.signer.sendTransaction(txConfig);
-
-                console.log(tx.hash);
-        }
+        const txObj = new makeTx(null, configs);
+        await txObj.sendTxs(txNum);
 };
 
 const main = async () => {
@@ -72,6 +55,7 @@ const main = async () => {
                 case "sendTxs":
                         sendTxs();
                         break;
+                // simple contract
                 case "deploy":
                         await myCounterContract.contractDeploy();
                         break;
@@ -83,22 +67,38 @@ const main = async () => {
                         await myCounterContract.manipulateNum(process.argv[3]);
                         break;
 
+                // erc20 token
                 case "erc20":
-                        const dir =
-                                "./artifacts/contracts/myToken.sol/MyToken.json";
-                        const deployer = new Deploy(dir, configs);
+                        const deployer = new DeployContract(
+                                configs.filepath + "myToken.sol/MyToken.json",
+                                configs
+                        );
                         await deployer.contractDeploy(
                                 ethers.parseEther("10000")
                         );
                         break;
                 case "tokenSend":
-                        const dir2 =
-                                "./artifacts/contracts/myToken.sol/MyToken.json";
-                        const erc20contract = new ERC20(dir2, configs);
+                        const erc20contract = new ERC20Contract(
+                                configs.filepath + "myToken.sol/MyToken.json",
+                                configs
+                        );
 
-                        await erc20contract.transfer("10");
+                        await erc20contract.transfer(w2.public, "10");
 
                         break;
+
+                // erc 721 deploy
+                case "erc721":
+                        const erc721Contract = new DeployContract(
+                                configs.filepath + "MyNFT.sol/MyToken.json",
+                                configs
+                        );
+
+                        await erc721Contract.contractDeploy(w1.public);
+                        break;
+
+                case "nftMint":
+                // const
 
                 default:
                         console.log("specify functions");

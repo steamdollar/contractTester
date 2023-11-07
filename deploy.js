@@ -1,6 +1,6 @@
 const ethers = require("ethers");
 
-class Deploy {
+class DeployContract {
         contractJSON;
         signer;
         provider;
@@ -31,4 +31,4 @@ class Deploy {
         }
 }
 
-module.exports = { Deploy };
+module.exports = { DeployContract };
