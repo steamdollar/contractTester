@@ -10,7 +10,7 @@ class ixconfig {
         filepath;
 
         constructor(pk) {
-                this.chainRPC = "http://192.168.0.170:8545";
+                this.chainRPC = "http://localhost:8545";
                 this.provider = new ethers.JsonRpcProvider(this.chainRPC);
                 this.wallet = new ethers.Wallet(pk, this.provider);
                 this.signer = this.wallet.connect(this.provider);

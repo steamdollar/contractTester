@@ -2,7 +2,7 @@ const keythereum = require("keythereum");
 
 const getPk = (
         publicKey,
-        datadir = "/home/lsj/eth/hardhat/keys",
+        datadir = "../keys",
         pw = "1234"
 ) => {
         let keyobj = keythereum.importFromFile(publicKey, datadir);
@@ -14,23 +14,23 @@ const getPk = (
 
 const wallet = {
         w1: {
-                private: "97aab27a6f4ec78f190fa53562e8b1ef511452b38debc600daf908a4f2b9b3e1",
-                public: "0x1d61b265007c71bde64ea2858bc31ece265c1e42",
+                private: "5bb4f24546981bfcbe5573bf23351a6d06d3e23a01f2f3257b6486492ad73ee7",
+                public: "0xed33a15de74827eff973a1967db3320359d9e215",
         },
         w2: {
-                private: "c0065e1f826cf3126ce244a0087b903537b68f34906495e7f1fb90962335b4de",
-                public: "0xaca8126914b246634b08d4f9fdf31a1970ed9005",
+                private: "93fff6e82529fae9965b69784d5c3366ffdbc5d6f078c1d862b2c203bc4d74fe",
+                public: "0x20a511d8df9a9127a46a252c4f21940105b42dd8",
         },
         w3: {
-                private: "e142a25ded2d68fd6456b91d990c828a021031ad402720568a01671e24aa19dd",
-                public: "0xb56f4cbecc4c2c705b101432cbfa65176561ac86",
+                private: "e74a08b2ade51d0857f23ef7f3b20a336e84a83938122dec82566dd5003ebb2c",
+                public: "0x2dee553cd7947d2062ccd5c6014b3e75f6ff994c",
         },
 };
 
 module.exports = { getPk, wallet };
 
 // const main = () => {
-//         getPk("0xb56f4cbecc4c2c705b101432cbfa65176561ac86");
+//         getPk("0x2dee553cd7947d2062ccd5c6014b3e75f6ff994c");
 // };
 
 // main();

@@ -20,7 +20,7 @@ const myCounterContract = new CounterContract(
 
 // 1. balance
 const getBalance = async () => {
-        const balance = await configs.provider.getBalance(w3.public);
+        const balance = await configs.provider.getBalance(w2.public);
         console.log(ethers.formatEther(balance));
 };
 
@@ -50,7 +50,8 @@ const main = async () => {
                         getBalance();
                         break;
                 case "sendTx":
-                        sendTx();
+                        // sendTx()
+                        setInterval(sendTx, 20000);
                         break;
                 case "sendTxs":
                         sendTxs();

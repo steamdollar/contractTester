@@ -20,6 +20,7 @@ class makeTx {
 
         async sendTxAndWait() {
                 const nonce = await this.getNonce();
+                console.log(nonce)
 
                 this.txConfig.nonce = nonce;
 
